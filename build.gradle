@@ -28,7 +28,8 @@ dependencies {
     compile 'com.github.vibrantkt:core:0.1.8-alpha'
 
 //    compile 'com.github.vibrantkt:base:0.2.2-alpha'
-    compile 'com.github.vibrantkt:base:dev-SNAPSHOT'
+    compile 'com.github.vibrantkt:base:master-SNAPSHOT'
+
     testCompile 'junit:junit:4.12'
 }
 

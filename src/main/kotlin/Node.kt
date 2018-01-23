@@ -15,7 +15,7 @@ open class Node : JSONRPCNode<Peer>() {
 
     val chain = Chain()
 
-    private var keyPair: KeyPair? = null
+    internal var keyPair: KeyPair? = null
 
 
     fun setAccount(keyPair: KeyPair){
@@ -113,7 +113,7 @@ open class Node : JSONRPCNode<Peer>() {
     fun transaction(to: String, amount: Long): List<JSONRPCResponse<*>> {
         this.checkAccount()
         val tp = TransactionPayload(amount)
-        val transaction = Transaction.create(this.hexAccountAddress()!!, to, tp)
+        val transaction = Transaction.create(this.hexAccountAddress()!!, to, tp, this.keyPair!!)
         return this.peer.broadcast(createRequest(
                 "addTransaction",
                 arrayOf(transaction.serialize())

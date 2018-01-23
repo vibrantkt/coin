@@ -36,10 +36,10 @@ class Chain(val difficulty: Int = 0): InMemoryBlockChain<Block, BlockChain>() {
         return this.blocks.flatMap { it.transactions.filter(predicate) }
     }
 
-    fun getAccount(address: String): Account?{
+    fun getAccount(address: String): Account{
         val transactionsWithHim = getAllTransactions { it.from == address || it.to == address }
         val money = transactionsWithHim.fold(0L){ cum, transaction ->
-            cum + if(transaction.from == address)-transaction.payload.amount else transaction.payload.amount
+            cum + if(transaction.from == address && transaction.to != address)-transaction.payload.amount else transaction.payload.amount
         }
         return Account(address, money, transactionsWithHim)
     }

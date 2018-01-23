@@ -5,9 +5,27 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.vibrant.core.node.RemoteNode
 import org.vibrant.example.chat.base.util.AccountUtils
+import org.vibrant.example.chat.base.util.HashUtils
+import java.util.*
 import java.util.concurrent.CountDownLatch
 
 class TestPeer {
+    fun mineBlock(chain: Chain, transactions: List<Transaction>): Block {
+        val lastBlock = chain.latestBlock()
+        var blockHash: String?
+        var nonce = 0L
+        val newIndex = lastBlock.index + 1
+        val prevHash = lastBlock.hash
+        val timestamp = Date().time
+        do {
+            nonce++
+            val serializedTransactions = transactions.map { it.serialize() }.joinToString("")
+            val content = newIndex.toString() + prevHash + serializedTransactions + nonce + timestamp
+            blockHash = HashUtils.bytesToHex(HashUtils.sha256(content.toByteArray()))
+        } while (blockHash!!.substring(0, chain.difficulty) != "0".repeat(chain.difficulty))
+
+        return Block(newIndex, prevHash, blockHash, transactions, nonce, timestamp)
+    }
 
 
     @Test
@@ -155,30 +173,6 @@ class TestPeer {
     }
 
     @Test
-    fun `Test mining block`(){
-
-        val latch = CountDownLatch(1)
-        val miner = Miner({
-            println("Block mined $it")
-            latch.countDown()
-        })
-        miner.start()
-
-        miner.addTransaction(Transaction.create("from", "to", TransactionPayload(100L)))
-
-        assertEquals(
-                1,
-                miner.pendingTransactions.size
-        )
-        latch.await()
-        assertEquals(
-                0,
-                miner.pendingTransactions.size
-        )
-
-    }
-
-    @Test
     fun `Test mining broadcast`(){
 
         val node = Node()
@@ -198,7 +192,24 @@ class TestPeer {
         miner.connect(RemoteNode("localhost", node2.peer.port))
         node.connect(RemoteNode("localhost", node2.peer.port))
 
-        miner.addTransaction(Transaction.create("from", "to", TransactionPayload(100L)))
+        node.setAccount(AccountUtils.generateKeyPair())
+
+        node.chain.addBlock(
+                mineBlock(node.chain, listOf(
+                        Transaction(
+                                "0x0",
+                                node.hexAccountAddress()!!,
+                                TransactionPayload(1000L),
+                                HashUtils.bytesToHex(HashUtils.sha1(("0x0" + node.hexAccountAddress()!! + TransactionPayload(1000L).serialize()).toByteArray())),
+                                "signature"
+                        )
+                ))
+        )
+
+        node.synchronize(RemoteNode("localhost", miner.peer.port))
+
+        miner.addTransaction(Transaction.create(node.hexAccountAddress()!!, node.hexAccountAddress()!!, TransactionPayload(100L), node.keyPair!!))
+
 
         assertEquals(
                 1,

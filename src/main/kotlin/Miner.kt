@@ -3,7 +3,9 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import models.Block
 import models.Transaction
+import org.vibrant.example.chat.base.util.AccountUtils
 import org.vibrant.example.chat.base.util.HashUtils
+import java.security.PublicKey
 import java.util.*
 
 class Miner(val onBlock: (Block) -> Unit = {}): Node() {
@@ -27,23 +29,29 @@ class Miner(val onBlock: (Block) -> Unit = {}): Node() {
 
             val transactions = this.pendingTransactions.toTypedArray().distinctBy { it.hash }.filter {
                 val acc = this@Miner.chain.getAccount(it.from)
-                acc != null && acc.money >= it.payload.amount && this@Miner.chain.getAccount(it.to) != null
+                val signatureFine = Transaction.verify(it)
+                logger.info { "This transaction is from $acc"}
+                logger.info { "This transaction is from $signatureFine"}
+                acc.money >= it.payload.amount && signatureFine
             }
-            synchronized(this.pendingTransactions){
+            synchronized(this.pendingTransactions) {
                 this.pendingTransactions.clear()
                 logger.info { "Cleared pending transactions" }
             }
-            val block = this.mineBlock(transactions)
-            logger.info { "Block mined $block" }
-            this@Miner.chain.addBlock(block)
-            val response = this.peer.broadcast(
-                    createRequest(
-                            "onNewBlock",
-                            arrayOf(block.serialize())
-                    )
-            )
-            logger.info { "Broad casted $response" }
-            this.onBlock(block)
+            logger.info { "Validated transactions are $transactions" }
+            if(transactions.isNotEmpty()) {
+                val block = this.mineBlock(transactions)
+                logger.info { "Block mined $block" }
+                this@Miner.chain.addBlock(block)
+                val response = this.peer.broadcast(
+                        createRequest(
+                                "onNewBlock",
+                                arrayOf(block.serialize())
+                        )
+                )
+                logger.info { "Broad casted $response" }
+                this.onBlock(block)
+            }
         }
     }
 
@@ -65,7 +73,7 @@ class Miner(val onBlock: (Block) -> Unit = {}): Node() {
     }
 
     fun addTransaction(transaction: Transaction){
-        logger.info { "Added pending transaction" }
+        logger.info { "Added pending transaction $transaction" }
         this.pendingTransactions.add(transaction)
     }
 }

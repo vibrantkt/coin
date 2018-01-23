@@ -2,7 +2,9 @@ import models.Block
 import models.Transaction
 import models.TransactionPayload
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Test
+import org.vibrant.example.chat.base.util.AccountUtils
 import org.vibrant.example.chat.base.util.HashUtils
 
 class GenerateGenesisBlock {
@@ -11,16 +13,19 @@ class GenerateGenesisBlock {
     @Test
     fun `Generate`(){
         val difficulty = 2
+        val keyPair = AccountUtils.generateKeyPair()
 
         var nonce = 0L
         val newIndex = 0
         val prevHash = ""
         var blockHash: String?
         val timestamp = 0
-        val genesisTransaction = Transaction.create(
-                from = "0x0",
-                to = "0x0",
-                payload = TransactionPayload(100_000_000L)
+        val genesisTransaction = Transaction(
+                "0x0",
+                "0x0",
+                TransactionPayload(100_000_000L),
+                HashUtils.bytesToHex(HashUtils.sha1(("0x0" + "0x0" + TransactionPayload(100_000_000L).serialize()).toByteArray())),
+                "0x0"
         )
         do {
             nonce++
@@ -35,4 +40,14 @@ class GenerateGenesisBlock {
         )
     }
 
+
+    @Ignore
+    @Test
+    fun `123`(){
+        val key = AccountUtils.generateKeyPair()
+        println(key.public.algorithm)
+        println(key.public.format)
+        println(key.public.encoded)
+//        println(HashUtils.bytesToHex())
+    }
 }
