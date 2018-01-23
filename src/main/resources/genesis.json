@@ -1,0 +1,1 @@
+{"@type":"block","index":0,"prevHash":"","hash":"00B6E2183B646C5CF2F2C8134ED3C5814D54CFC444B7161AF4201C7F81CF202F","transactions":[{"@type":"transaction","from":"0x0","to":"0x0","payload":{"@type":"transaction-payload","amount":100000000},"hash":"F829C8DE6B190E95BC3A1482496E0CA714775C19"}],"nonce":423,"timestamp":0}
