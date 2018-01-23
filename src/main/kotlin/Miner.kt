@@ -25,7 +25,10 @@ class Miner(val onBlock: (Block) -> Unit = {}): Node() {
     private fun mine(){
         if(this.pendingTransactions.isNotEmpty()){
 
-            val transactions = this.pendingTransactions.toTypedArray().distinctBy { it.hash }
+            val transactions = this.pendingTransactions.toTypedArray().distinctBy { it.hash }.filter {
+                val acc = this@Miner.chain.getAccount(it.from)
+                acc != null && acc.money >= it.payload.amount && this@Miner.chain.getAccount(it.to) != null
+            }
             synchronized(this.pendingTransactions){
                 this.pendingTransactions.clear()
                 logger.info { "Cleared pending transactions" }

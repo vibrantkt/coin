@@ -22,7 +22,6 @@ class TestCoin{
         val latch = CountDownLatch(1)
 
         val miner = Miner({
-            println("Block mined $it")
             latch.countDown()
         })
         miner.start()
@@ -32,19 +31,6 @@ class TestCoin{
 
         node.setAccount(AccountUtils.generateKeyPair())
 
-
-        assertEquals(
-                1,
-                node2.peer.peers.size
-        )
-        assertEquals(
-                2,
-                node.peer.peers.size
-        )
-        assertEquals(
-                1,
-                miner.peer.peers.size
-        )
 
 
         val tp = Transaction.create(
@@ -60,13 +46,59 @@ class TestCoin{
 
         latch.await()
 
-        println(node.chain.produce(JSONSerializer).serialize())
-        println(miner.chain.produce(JSONSerializer).serialize())
-        println(node2.chain.produce(JSONSerializer).serialize())
-
         assertEquals(
                 100,
                 node2.chain.getAccount(node.hexAccountAddress()!!)!!.money
+        )
+
+
+    }
+
+
+    @Test
+    fun `Test bad transaction result`(){
+        val node = Node()
+        node.start()
+
+        val node2 = Node()
+        node2.start()
+
+        val latch = CountDownLatch(1)
+
+        val miner = Miner({
+            latch.countDown()
+        })
+        miner.start()
+
+        node2.connect(RemoteNode("localhost", node.peer.port))
+        node.connect(RemoteNode("localhost", miner.peer.port))
+
+        node.setAccount(AccountUtils.generateKeyPair())
+        node2.setAccount(AccountUtils.generateKeyPair())
+
+
+
+        val tp = Transaction.create(
+                node.hexAccountAddress()!!,
+                node2.hexAccountAddress()!!,
+                TransactionPayload(100L)
+        )
+
+        node.peer.broadcast(node.createRequest(
+                "addTransaction",
+                arrayOf(tp.serialize())
+        ))
+
+        latch.await()
+
+        assertEquals(
+                0,
+                node2.chain.getAccount(node.hexAccountAddress()!!)!!.money
+        )
+
+        assertEquals(
+                0,
+                node.chain.getAccount(node.hexAccountAddress()!!)!!.money
         )
 
 
