@@ -1,6 +1,7 @@
 import models.Block
 import models.Transaction
 import models.TransactionPayload
+import node.Chain
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Test
@@ -36,7 +37,7 @@ class GenerateGenesisBlock {
 
         assertEquals(
                 Block(newIndex, prevHash, blockHash, listOf(genesisTransaction), nonce, timestamp = 0).serialize(),
-                Chain::class.java.getResource("genesis.json").readText()
+                CLI::class.java.getResource("genesis.json").readText()
         )
     }
 

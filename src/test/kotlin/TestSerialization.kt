@@ -2,6 +2,7 @@ import models.Block
 import models.BlockChain
 import models.Transaction
 import models.TransactionPayload
+import node.JSONSerializer
 import org.junit.Assert
 import org.junit.Test
 import org.vibrant.core.models.Model

@@ -1,3 +1,4 @@
+import node.JSONSerializer
 import org.vibrant.base.rpc.json.JSONRPCResponse
 import org.vibrant.core.models.Model
 

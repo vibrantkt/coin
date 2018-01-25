@@ -1,3 +1,5 @@
+package node
+
 import com.fasterxml.jackson.annotation.JsonTypeName
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

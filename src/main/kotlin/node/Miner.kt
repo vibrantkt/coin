@@ -1,11 +1,12 @@
+package node
+
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import models.Block
 import models.Transaction
-import org.vibrant.example.chat.base.util.AccountUtils
 import org.vibrant.example.chat.base.util.HashUtils
-import java.security.PublicKey
+import serialize
 import java.util.*
 
 class Miner(val onBlock: (Block) -> Unit = {}): Node() {
@@ -26,14 +27,16 @@ class Miner(val onBlock: (Block) -> Unit = {}): Node() {
 
     private fun mine(){
         if(this.pendingTransactions.isNotEmpty()){
-
+            logger.info { "Got transactions to mine!" }
             val transactions = this.pendingTransactions.toTypedArray().distinctBy { it.hash }.filter {
                 val acc = this@Miner.chain.getAccount(it.from)
-                val signatureFine = Transaction.verify(it)
+                val gimmeMoneyRequest = it.from == "0x0"
+                val signatureFine = gimmeMoneyRequest || Transaction.verify(it)
                 logger.info { "This transaction is from $acc"}
                 logger.info { "This transaction is from $signatureFine"}
                 acc.money >= it.payload.amount && signatureFine
             }
+            logger.info { "Well here we ge" }
             synchronized(this.pendingTransactions) {
                 this.pendingTransactions.clear()
                 logger.info { "Cleared pending transactions" }

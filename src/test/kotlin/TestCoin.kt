@@ -1,7 +1,8 @@
 import models.Block
 import models.Transaction
 import models.TransactionPayload
-import org.junit.Assert
+import node.Chain
+import node.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.vibrant.core.node.RemoteNode

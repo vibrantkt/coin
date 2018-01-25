@@ -1,3 +1,5 @@
+package node
+
 import account.Account
 import models.Block
 import models.BlockChain
@@ -23,7 +25,7 @@ class Chain(val difficulty: Int = 0): InMemoryBlockChain<Block, BlockChain>() {
     }
 
     override fun createGenesisBlock(): Block {
-        return JSONSerializer.deserialize(Chain::class.java.getResource("genesis.json").readBytes()) as Block
+        return JSONSerializer.deserialize(Chain::class.java.classLoader.getResource("genesis.json").readBytes()) as Block
     }
 
     override fun produce(serializer: ModelSerializer): BlockChain {
