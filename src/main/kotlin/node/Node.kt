@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream
 
 open class Node : JSONRPCNode<Peer>() {
     open val isMiner: Boolean = false
+    private val rpc = JSONRPCProtocol(this)
     override val peer = this.createPeer()
 
     val chain = Chain()
@@ -56,7 +57,7 @@ open class Node : JSONRPCNode<Peer>() {
             try {
                 Socket("localhost", port).close()
             }catch (e: Exception){
-                return Peer(port, JSONRPCProtocol(this))
+                return Peer(port, rpc)
             }
         }
     }
@@ -113,59 +114,8 @@ open class Node : JSONRPCNode<Peer>() {
         }
     }
 
-    fun handleLastBlock(remoteNode: RemoteNode, lastBlock: Block): Boolean {
-        val localLatestBlock = this.chain.latestBlock()
-        if(localLatestBlock != lastBlock){
-            logger.info { " My chain is not in sync with peer $remoteNode" }
-            when {
-            // next block
-                lastBlock.index - localLatestBlock.index == 1 && lastBlock.prevHash == localLatestBlock.hash -> {
-                    this.chain.addBlock(
-                            lastBlock
-                    )
-                    logger.info { "I just got next block. node.Chain good: ${chain.checkIntegrity()}" }
-                }
-            // block is ahead
-                lastBlock.index > localLatestBlock.index -> {
-                    logger.info { "My chain is behind, requesting full chain" }
-                    val chainResponse = this.request(
-                            this.createRequest("getFullChain", arrayOf()),
-                            remoteNode
-                    )
-
-                    val model = chainResponse.deserialize<BlockChain>()
-                    val tmpChain = Chain.instantiate(model)
-                    val chainOK = tmpChain.checkIntegrity()
-
-                    if(chainOK){
-                        logger.info { "Received chain is fine, replacing" }
-                        this.chain.dump(model)
-                        logger.info { "Received chain is fine, replaced" }
-                    }else{
-                        logger.info { "Received chain is not fine, I ignore it" }
-                    }
-                }
-            // block is behind
-                else -> {
-                    logger.info { "My chain is ahead, sending request" }
-                    val response = this.request(this.createRequest("syncWithMe", arrayOf()), remoteNode)
-                    logger.info { "Got response! $response" }
-                }
-            }
-            return false
-        }else{
-            logger.info { "node.Chain in sync with peer $remoteNode" }
-            return true
-        }
-    }
-
     fun synchronize(remoteNode: RemoteNode){
-        val lastBlock = this.request(
-                this.createRequest("getLastBlock", arrayOf()),
-                remoteNode
-        )
-        val block = JSONSerializer.deserialize(lastBlock.stringResult().toByteArray()) as Block
-        this.handleLastBlock(remoteNode, block)
+        this.rpc.synchronize(remoteNode)
     }
 
 

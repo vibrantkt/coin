@@ -11,7 +11,7 @@ class CLI<out T: Node>(val node: T) {
     init {
         this.node.setAccount(Node.loadFromFile("/home/enchanting/ssh/coin"))
         this.node.connect(RemoteNode("localhost", 7002))
-        if(node.chain.getAccount(this.node.hexAccountAddress()!!).money == 0L){
+        if(node.chain.state.getAccount(this.node.hexAccountAddress()!!).money == 0L){
             this.node.gimmeMoney(1000)
         }
     }
@@ -56,7 +56,7 @@ class CLI<out T: Node>(val node: T) {
                     }.joinToString(", "))
                 }
                 "money" -> {
-                    val account = this.node.chain.getAccount(this.node.hexAccountAddress()!!)
+                    val account = this.node.chain.state.getAccount(this.node.hexAccountAddress()!!)
                     println(account.money.toString() + " coins")
                 }
                 "chain" -> {

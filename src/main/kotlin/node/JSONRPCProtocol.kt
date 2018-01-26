@@ -1,34 +1,80 @@
 package node
 
 import models.Block
+import models.BlockChain
 import models.Transaction
+import mu.KotlinLogging
+import org.vibrant.base.database.blockchain.InstantiateBlockChain
 import org.vibrant.base.rpc.JSONRPCMethod
 import org.vibrant.base.rpc.json.*
+import org.vibrant.core.ConcreteModelSerializer
+import org.vibrant.core.models.Model
 import org.vibrant.core.node.RemoteNode
-import serialize
 
 @Suppress("UNUSED_PARAMETER", "unused")
-class JSONRPCProtocol(private val node: Node) : JSONRPC() {
+class JSONRPCProtocol(override val node: Node) : JSONRPC(), JSONRPCBlockChainSynchronization<Peer, Block, Transaction, BlockChain> {
 
 
-    private val broadcastedTransactions = arrayListOf<String>()
-    private val broadcastedBlocks = arrayListOf<String>()
-
-    @JSONRPCMethod
-    fun addTransaction(request: JSONRPCRequest, remoteNode: RemoteNode): JSONRPCResponse<*>{
-        val transaction = JSONSerializer.deserialize(request.params[0].toString().toByteArray()) as Transaction
-        if(!this.broadcastedTransactions.contains(transaction.hash)) {
-            this.broadcastedTransactions.add(transaction.hash)
-            this.node.peer.broadcast(request, this.node.peer.peers.filter { it.address != remoteNode.address || it.port != remoteNode.port })
-            val isMiner = node.isMiner
-            if(isMiner){
-
-                (this.node as Miner).addTransaction(
-                        transaction
-                )
-            }
+    override val chainSerializer: ConcreteModelSerializer<BlockChain> = object: ConcreteModelSerializer<BlockChain>() {
+        override fun deserialize(serialized: ByteArray): BlockChain {
+            return JSONSerializer.deserialize(serialized) as BlockChain
         }
-        return JSONRPCResponse(node.isMiner, null, request.id)
+
+        override fun serialize(model: Model): ByteArray {
+            return JSONSerializer.serialize(model)
+        }
+
+    }
+
+    override val blockSerializer: ConcreteModelSerializer<Block> = object: ConcreteModelSerializer<Block>() {
+        override fun deserialize(serialized: ByteArray): Block {
+            return JSONSerializer.deserialize(serialized) as Block
+        }
+
+        override fun serialize(model: Model): ByteArray {
+            return JSONSerializer.serialize(model)
+        }
+
+    }
+
+    override val transactionSerializer = object: ConcreteModelSerializer<Transaction>() {
+        override fun deserialize(serialized: ByteArray): Transaction {
+            return JSONSerializer.deserialize(serialized) as Transaction
+        }
+
+        override fun serialize(model: Model): ByteArray {
+            return JSONSerializer.serialize(model)
+        }
+
+    }
+
+    override val modelToProducer: InstantiateBlockChain<Block, BlockChain> =
+            object: InstantiateBlockChain<Block, BlockChain>{
+                override fun asBlockChainProducer(model: BlockChain): org.vibrant.base.database.blockchain.BlockChain<Block, BlockChain> {
+                    val producer = Chain()
+                    producer.setBlocks(model.blocks.toList())
+                    return producer
+                }
+
+            }
+
+    override val chain: Chain
+        get() = node.chain
+
+    override val broadcastedTransactions = arrayListOf<String>()
+    override val broadcastedBlocks = arrayListOf<String>()
+
+
+    override val logger = KotlinLogging.logger {  }
+
+    override fun handleDistinctTransaction(transaction: Transaction) {
+        val isMiner = node.isMiner
+        if(isMiner){
+
+            (this.node as Miner).addTransaction(
+                    transaction
+            )
+        }
     }
 
     @JSONRPCMethod
@@ -41,42 +87,6 @@ class JSONRPCProtocol(private val node: Node) : JSONRPC() {
         )
     }
 
-
-    @JSONRPCMethod
-    fun onNewBlock(request: JSONRPCRequest, remoteNode: RemoteNode): JSONRPCResponse<*>{
-        val block = JSONSerializer.deserialize(request.params[0].toString().toByteArray()) as Block
-        logger.info { "Received last block, handling.." }
-        val result = this.node.handleLastBlock(remoteNode, block)
-
-        if(!broadcastedBlocks.contains(block.hash)){
-            broadcastedBlocks.add(block.hash)
-            logger.info { "$result - true => block already attached and i won't share" }
-            if(!result) {
-                val some = this.node.peer.broadcast(request, this.node.peer.peers.filter { it.address != remoteNode.address || it.port != remoteNode.port })
-                logger.info { "Broad casted between connected nodes $some" }
-            }
-        }
-        return JSONRPCResponse(result, null, request.id)
-    }
-
-    @JSONRPCMethod
-    fun getLastBlock(request: JSONRPCRequest, remoteNode: RemoteNode): JSONRPCResponse<*>{
-        return JSONRPCResponse(
-                this.node.chain.latestBlock().serialize(),
-                null,
-                request.id
-        )
-    }
-
-    @JSONRPCMethod
-    fun getFullChain(request: JSONRPCRequest, remoteNode: RemoteNode): JSONRPCResponse<*>{
-        logger.info { this.node.chain.produce(JSONSerializer).serialize() }
-        return JSONRPCResponse(
-                this.node.chain.produce(JSONSerializer).serialize(),
-                null,
-                request.id
-        )
-    }
 
 
 

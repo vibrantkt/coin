@@ -17,7 +17,7 @@ class GenerateGenesisBlock {
         val keyPair = AccountUtils.generateKeyPair()
 
         var nonce = 0L
-        val newIndex = 0
+        val newIndex = 0L
         val prevHash = ""
         var blockHash: String?
         val timestamp = 0

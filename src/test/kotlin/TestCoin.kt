@@ -83,7 +83,7 @@ class TestCoin{
 
         assertEquals(
                 100,
-                node2.chain.getAccount(node2.hexAccountAddress()!!).money
+                node2.chain.state.getAccount(node2.hexAccountAddress()!!).money
         )
 
 
@@ -126,12 +126,12 @@ class TestCoin{
         ))
         assertEquals(
                 0,
-                miner.chain.getAccount(node.hexAccountAddress()!!).money
+                miner.chain.state.getAccount(node.hexAccountAddress()!!).money
         )
 
         assertEquals(
                 0,
-                miner.chain.getAccount(node.hexAccountAddress()!!).money
+                miner.chain.state.getAccount(node.hexAccountAddress()!!).money
         )
     }
 
@@ -209,12 +209,12 @@ class TestCoin{
 
         assertEquals(
                 800,
-                node.chain.getAccount(node.hexAccountAddress()!!)!!.money
+                node.chain.state.getAccount(node.hexAccountAddress()!!)!!.money
         )
 
         assertEquals(
                 200,
-                node2.chain.getAccount(node2.hexAccountAddress()!!)!!.money
+                node2.chain.state.getAccount(node2.hexAccountAddress()!!)!!.money
         )
     }
 }

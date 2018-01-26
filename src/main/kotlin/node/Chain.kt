@@ -1,23 +1,24 @@
 package node
 
-import account.Account
 import models.Block
 import models.BlockChain
-import models.Transaction
 import mu.KotlinLogging
 import org.vibrant.base.database.blockchain.InMemoryBlockChain
+import org.vibrant.base.database.blockchain.models.BlockChainModel
 import org.vibrant.core.ModelSerializer
 
 class Chain(val difficulty: Int = 0): InMemoryBlockChain<Block, BlockChain>() {
 
     private val logger = KotlinLogging.logger {  }
 
+    val state = ChainState(this)
+
     override fun checkIntegrity(): Boolean {
         this.blocks.reduce{a, b ->
-            if(a.hash == b.prevHash){
+            if(a.hash == b.previousHash){
                 b
             }else{
-                logger.info { "Wrong hashes, expected ${b.prevHash} == ${a.hash}" }
+                logger.info { "Wrong hashes, expected ${b.previousHash} == ${a.hash}" }
                 return false
             }
         }
@@ -33,27 +34,20 @@ class Chain(val difficulty: Int = 0): InMemoryBlockChain<Block, BlockChain>() {
     }
 
 
-
-    fun getAllTransactions(predicate: (Transaction) -> Boolean): List<Transaction> {
-        return this.blocks.flatMap { it.transactions.filter(predicate) }
-    }
-
-    fun getAccount(address: String): Account{
-        val transactionsWithHim = getAllTransactions { it.from == address || it.to == address }
-        val money = transactionsWithHim.fold(0L){ cum, transaction ->
-            cum + if(transaction.from == address && transaction.to != address)-transaction.payload.amount else transaction.payload.amount
-        }
-        return Account(address, money, transactionsWithHim)
-    }
-
-
-
-
-
-    fun dump(blockChainModel: BlockChain){
+    override fun dump(copy: BlockChain){
         this.blocks.clear()
-        this.blocks.addAll(blockChainModel.blocks)
-        this.notifyNewBlock()
+        this.blocks.addAll(copy.blocks)
+        this.state.reset()
+    }
+
+    fun setBlocks(blocks: List<Block>){
+        this.blocks.clear()
+        this.blocks.addAll(blocks)
+    }
+
+
+    fun blocks(): List<Block> {
+        return this.blocks.toList()
     }
 
     companion object {

@@ -2,6 +2,7 @@ package models
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import org.vibrant.base.database.blockchain.models.HashedTransaction
 import org.vibrant.base.database.blockchain.models.TransactionModel
 import org.vibrant.base.database.blockchain.models.TransactionPayload
 import org.vibrant.example.chat.base.util.AccountUtils
@@ -17,8 +18,8 @@ data class Transaction(
         val from: String,
         val to: String,
         val payload: models.TransactionPayload,
-        val hash: String,
-        val signature: String): TransactionModel(){
+        override val hash: String,
+        val signature: String): HashedTransaction(hash){
     companion object {
         fun create(from: String, to: String, payload: models.TransactionPayload, keyPair: KeyPair): Transaction {
             return Transaction(

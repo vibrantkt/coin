@@ -27,8 +27,8 @@ dependencies {
 
     compile 'com.github.vibrantkt:core:0.1.8-alpha'
 
-//    compile 'com.github.vibrantkt:base:0.2.2-alpha'
-    compile 'com.github.vibrantkt:base:master-SNAPSHOT'
+    compile 'com.github.vibrantkt:base:0.2.31-alpha'
+
     compile 'com.hierynomus:sshj:0.23.0'
 
     testCompile 'junit:junit:4.12'
@@ -44,4 +44,9 @@ kotlin {
     experimental {
         coroutines "enable"
     }
+}
+
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }

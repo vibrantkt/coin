@@ -29,7 +29,7 @@ class Miner(val onBlock: (Block) -> Unit = {}): Node() {
         if(this.pendingTransactions.isNotEmpty()){
             logger.info { "Got transactions to mine!" }
             val transactions = this.pendingTransactions.toTypedArray().distinctBy { it.hash }.filter {
-                val acc = this@Miner.chain.getAccount(it.from)
+                val acc = this@Miner.chain.state.getAccount(it.from)
                 val gimmeMoneyRequest = it.from == "0x0"
                 val signatureFine = gimmeMoneyRequest || Transaction.verify(it)
                 logger.info { "This transaction is from $acc"}
