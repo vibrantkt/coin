@@ -14,7 +14,6 @@ class GenerateGenesisBlock {
     @Test
     fun `Generate`(){
         val difficulty = 2
-        val keyPair = AccountUtils.generateKeyPair()
 
         var nonce = 0L
         val newIndex = 0L

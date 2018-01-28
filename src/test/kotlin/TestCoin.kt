@@ -201,20 +201,20 @@ class TestCoin{
 
         latch.await()
 
-        println(node.chain.produce(JSONSerializer).serialize())
-        println(node2.chain.produce(JSONSerializer).serialize())
-        println(miner.chain.produce(JSONSerializer).serialize())
+//        println(node.chain.produce(JSONSerializer).serialize())
+//        println(node2.chain.produce(JSONSerializer).serialize())
+//        println(miner.chain.produce(JSONSerializer).serialize())
 
 
 
         assertEquals(
                 800,
-                node.chain.state.getAccount(node.hexAccountAddress()!!)!!.money
+                node.chain.state.getAccount(node.hexAccountAddress()!!).money
         )
 
         assertEquals(
                 200,
-                node2.chain.state.getAccount(node2.hexAccountAddress()!!)!!.money
+                node2.chain.state.getAccount(node2.hexAccountAddress()!!).money
         )
     }
 }

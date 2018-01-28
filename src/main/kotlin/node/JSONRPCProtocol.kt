@@ -87,16 +87,4 @@ class JSONRPCProtocol(override val node: Node) : JSONRPC(), JSONRPCBlockChainSyn
         )
     }
 
-
-
-
-    @JSONRPCMethod
-    fun syncWithMe(request: JSONRPCRequest, remoteNode: RemoteNode): JSONRPCResponse<*>{
-        this.node.synchronize(remoteNode)
-        return JSONRPCResponse(
-                true,
-                null,
-                request.id
-        )
-    }
 }
