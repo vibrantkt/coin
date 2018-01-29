@@ -5,7 +5,7 @@ import models.Block
 import models.Transaction
 import mu.KotlinLogging
 
-class ChainState(val chain: Chain) {
+class ChainState(private val chain: Chain) {
 
     private val logger = KotlinLogging.logger {  }
     private val accounts = hashMapOf<String, Account>()

@@ -5,16 +5,18 @@ import node.Chain
 import node.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.vibrant.base.util.HashUtils
+import org.vibrant.base.util.SHA1
+import org.vibrant.base.util.SHA256
+import org.vibrant.base.util.SignTools
 import org.vibrant.core.node.RemoteNode
-import org.vibrant.example.chat.base.util.AccountUtils
-import org.vibrant.example.chat.base.util.HashUtils
 import java.util.*
 import java.util.concurrent.CountDownLatch
 
 
 class TestCoin{
 
-    fun mineBlock(chain: Chain, transactions: List<Transaction>): Block {
+    private fun mineBlock(chain: Chain, transactions: List<Transaction>): Block {
         val lastBlock = chain.latestBlock()
         var blockHash: String?
         var nonce = 0L
@@ -23,9 +25,9 @@ class TestCoin{
         val timestamp = Date().time
         do {
             nonce++
-            val serializedTransactions = transactions.map { it.serialize() }.joinToString("")
+            val serializedTransactions = transactions.joinToString("") { it.serialize() }
             val content = newIndex.toString() + prevHash + serializedTransactions + nonce + timestamp
-            blockHash = HashUtils.bytesToHex(HashUtils.sha256(content.toByteArray()))
+            blockHash = HashUtils.bytesToHex(SHA256.produceHash(content.toByteArray()))
         } while (blockHash!!.substring(0, chain.difficulty) != "0".repeat(chain.difficulty))
 
         return Block(newIndex, prevHash, blockHash, transactions, nonce, timestamp)
@@ -49,8 +51,8 @@ class TestCoin{
         node2.connect(RemoteNode("localhost", node.peer.port))
         node.connect(RemoteNode("localhost", miner.peer.port))
 
-        node.setAccount(AccountUtils.generateKeyPair())
-        node2.setAccount(AccountUtils.generateKeyPair())
+        node.setAccount(SignTools.generateKeyPair("RSA"))
+        node2.setAccount(SignTools.generateKeyPair("RSA"))
 
 
         node.chain.addBlock(
@@ -59,7 +61,7 @@ class TestCoin{
                                 "0x0",
                                 node.hexAccountAddress()!!,
                                 TransactionPayload(1000L),
-                                HashUtils.bytesToHex(HashUtils.sha1(("0x0" + node.hexAccountAddress()!! + TransactionPayload(1000L).serialize()).toByteArray())),
+                                HashUtils.bytesToHex(SHA1.produceHash(("0x0" + node.hexAccountAddress()!! + TransactionPayload(1000L).serialize()).toByteArray())),
                                 "signature"
                         )
                 ))
@@ -108,8 +110,8 @@ class TestCoin{
         node2.connect(RemoteNode("localhost", node.peer.port))
         node.connect(RemoteNode("localhost", miner.peer.port))
 
-        node.setAccount(AccountUtils.generateKeyPair())
-        node2.setAccount(AccountUtils.generateKeyPair())
+        node.setAccount(SignTools.generateKeyPair("RSA"))
+        node2.setAccount(SignTools.generateKeyPair("RSA"))
 
 
 
@@ -117,7 +119,7 @@ class TestCoin{
                 node.hexAccountAddress()!!,
                 node2.hexAccountAddress()!!,
                 TransactionPayload(100L),
-                AccountUtils.generateKeyPair()
+                SignTools.generateKeyPair("RSA")
         )
 
         node.peer.broadcast(node.createRequest(
@@ -154,8 +156,8 @@ class TestCoin{
         node2.connect(RemoteNode("localhost", node.peer.port))
         node.connect(RemoteNode("localhost", miner.peer.port))
 
-        node.setAccount(AccountUtils.generateKeyPair())
-        node2.setAccount(AccountUtils.generateKeyPair())
+        node.setAccount(SignTools.generateKeyPair("RSA"))
+        node2.setAccount(SignTools.generateKeyPair("RSA"))
 
         node.chain.addBlock(
             mineBlock(node.chain, listOf(
@@ -163,7 +165,7 @@ class TestCoin{
                             "0x0",
                             node.hexAccountAddress()!!,
                             TransactionPayload(1000L),
-                            HashUtils.bytesToHex(HashUtils.sha1(("0x0" + node.hexAccountAddress()!! + TransactionPayload(1000L).serialize()).toByteArray())),
+                            HashUtils.bytesToHex(SHA1.produceHash(("0x0" + node.hexAccountAddress()!! + TransactionPayload(1000L).serialize()).toByteArray())),
                             "signature"
                         )
             ))

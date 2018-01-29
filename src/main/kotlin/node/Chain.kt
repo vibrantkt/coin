@@ -4,7 +4,6 @@ import models.Block
 import models.BlockChain
 import mu.KotlinLogging
 import org.vibrant.base.database.blockchain.InMemoryBlockChain
-import org.vibrant.base.database.blockchain.models.BlockChainModel
 import org.vibrant.core.ModelSerializer
 
 class Chain(val difficulty: Int = 0): InMemoryBlockChain<Block, BlockChain>() {
@@ -50,13 +49,5 @@ class Chain(val difficulty: Int = 0): InMemoryBlockChain<Block, BlockChain>() {
         return this.blocks.toList()
     }
 
-    companion object {
 
-        fun instantiate(blockChainModel: BlockChain): Chain {
-            val producer = Chain()
-            producer.blocks.clear()
-            producer.blocks.addAll(blockChainModel.blocks)
-            return producer
-        }
-    }
 }

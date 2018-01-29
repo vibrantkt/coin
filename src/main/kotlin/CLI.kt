@@ -1,15 +1,12 @@
 import node.Node
 import org.vibrant.core.node.RemoteNode
-import org.vibrant.example.chat.base.util.AccountUtils
 import node.JSONSerializer
+import org.vibrant.base.util.SignTools
 
 class CLI<out T: Node>(val node: T) {
 
-
-
-
     init {
-        this.node.setAccount(Node.loadFromFile("/home/enchanting/ssh/coin"))
+        this.node.setAccount(Node.loadFromFile("${System.getProperty("user.home")}/ssh/coin"))
         this.node.connect(RemoteNode("localhost", 7002))
         if(node.chain.state.getAccount(this.node.hexAccountAddress()!!).money == 0L){
             this.node.gimmeMoney(1000)
@@ -51,9 +48,9 @@ class CLI<out T: Node>(val node: T) {
                     }
                 }
                 "peers" -> {
-                    println(this.node.peer.peers.map {
+                    println(this.node.peer.peers.joinToString(", ") {
                         it.address + ":" + it.port
-                    }.joinToString(", "))
+                    })
                 }
                 "money" -> {
                     val account = this.node.chain.state.getAccount(this.node.hexAccountAddress()!!)
@@ -82,7 +79,7 @@ class CLI<out T: Node>(val node: T) {
     }
 
     private fun createAccount(path: String){
-        val keyPair = AccountUtils.generateKeyPair()
+        val keyPair = SignTools.generateKeyPair("RSA")
         this.node.setAccount(keyPair)
         Node.saveKeyPair(keyPair, path)
     }

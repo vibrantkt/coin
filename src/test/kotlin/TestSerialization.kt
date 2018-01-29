@@ -6,9 +6,9 @@ import node.JSONSerializer
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.vibrant.base.util.SignTools
 import org.vibrant.core.ConcreteModelSerializer
 import org.vibrant.core.models.Model
-import org.vibrant.example.chat.base.util.AccountUtils
 
 class TestSerialization {
 
@@ -25,9 +25,9 @@ class TestSerialization {
             )
         }
         assertFor(TransactionPayload(100L))
-        assertFor(Transaction.create("from", "to", TransactionPayload(100L), AccountUtils.generateKeyPair()))
-        assertFor(Block(0, "", "", listOf(Transaction.create("from", "to", TransactionPayload(100L), AccountUtils.generateKeyPair())), 1))
-        assertFor(BlockChain(0, arrayOf(Block(0, "", "", listOf(Transaction.create("from", "to", TransactionPayload(100L), AccountUtils.generateKeyPair())), 1))))
+        assertFor(Transaction.create("from", "to", TransactionPayload(100L), SignTools.generateKeyPair("RSA")))
+        assertFor(Block(0, "", "", listOf(Transaction.create("from", "to", TransactionPayload(100L), SignTools.generateKeyPair("RSA"))), 1))
+        assertFor(BlockChain(0, arrayOf(Block(0, "", "", listOf(Transaction.create("from", "to", TransactionPayload(100L), SignTools.generateKeyPair("RSA"))), 1))))
     }
 
 
@@ -43,7 +43,7 @@ class TestSerialization {
             }
 
         }
-        val block = Block(0, "", "", listOf(Transaction.create("from", "to", TransactionPayload(100L), AccountUtils.generateKeyPair())), 1)
+        val block = Block(0, "", "", listOf(Transaction.create("from", "to", TransactionPayload(100L), SignTools.generateKeyPair("RSA"))), 1)
         assertEquals(
             String(JSONSerializer.serialize(BlockChain(2, arrayOf(block)))),
             String(serializer.serialize(BlockChain(2, arrayOf(block))))

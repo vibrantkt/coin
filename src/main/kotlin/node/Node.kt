@@ -1,35 +1,23 @@
 package node
 
-import deserialize
-import models.Block
-import models.BlockChain
 import models.Transaction
 import models.TransactionPayload
 import org.vibrant.base.node.JSONRPCNode
 import org.vibrant.base.rpc.json.JSONRPCResponse
+import org.vibrant.base.util.HashUtils
 import org.vibrant.core.node.RemoteNode
-import org.vibrant.example.chat.base.util.HashUtils
 import serialize
-import stringResult
 import java.io.*
 import java.net.Socket
 import java.security.KeyPair
-import java.security.KeyFactory
-import java.security.spec.PKCS8EncodedKeySpec
-import java.nio.file.Paths
-import java.nio.file.Files
-import java.security.PrivateKey
-import java.security.PublicKey
-import java.security.spec.X509EncodedKeySpec
-import java.io.ObjectInputStream
-import java.io.ByteArrayInputStream
-
-
 
 
 open class Node : JSONRPCNode<Peer>() {
     open val isMiner: Boolean = false
+
+    @Suppress("LeakingThis")
     private val rpc = JSONRPCProtocol(this)
+
     override val peer = this.createPeer()
 
     val chain = Chain()
@@ -74,21 +62,6 @@ open class Node : JSONRPCNode<Peer>() {
             fos.close()
         }
 
-
-        private fun privateFromFile(path: String): PrivateKey {
-            val keyBytes = Files.readAllBytes(Paths.get(path))
-            val spec = PKCS8EncodedKeySpec(keyBytes)
-            val kf = KeyFactory.getInstance("RSA")
-            return kf.generatePrivate(spec)
-        }
-
-        private fun publicFromFile(path: String): PublicKey {
-            val keyBytes = Files.readAllBytes(Paths.get(path))
-
-            val spec = X509EncodedKeySpec(keyBytes)
-            val kf = KeyFactory.getInstance("RSA")
-            return kf.generatePublic(spec)
-        }
 
         fun loadFromFile(path1: String): KeyPair {
             val fis = FileInputStream(path1)

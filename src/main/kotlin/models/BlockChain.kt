@@ -8,7 +8,7 @@ import java.util.*
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY)
 @JsonTypeName("chain")
-data class BlockChain(val difficulty: Int, val blocks: Array<Block>) : BlockChainModel() {
+data class BlockChain(private val difficulty: Int, val blocks: Array<Block>) : BlockChainModel() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

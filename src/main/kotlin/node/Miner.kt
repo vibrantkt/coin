@@ -5,11 +5,12 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import models.Block
 import models.Transaction
-import org.vibrant.example.chat.base.util.HashUtils
+import org.vibrant.base.util.HashUtils
+import org.vibrant.base.util.SHA1
 import serialize
 import java.util.*
 
-class Miner(val onBlock: (Block) -> Unit = {}): Node() {
+class Miner(private val onBlock: (Block) -> Unit = {}): Node() {
 
     internal val pendingTransactions = arrayListOf<Transaction>()
     override val isMiner = true
@@ -22,6 +23,11 @@ class Miner(val onBlock: (Block) -> Unit = {}): Node() {
             if(this@Miner.pendingTransactions.size == 0)
                 delay(1000)
         }
+    }
+
+    override fun stop() {
+        this.minerThread.cancel()
+        super.stop()
     }
 
 
@@ -67,9 +73,9 @@ class Miner(val onBlock: (Block) -> Unit = {}): Node() {
         val timestamp = Date().time
         do {
             nonce++
-            val serializedTransactions = transactions.map { it.serialize() }.joinToString("")
+            val serializedTransactions = transactions.joinToString("") { it.serialize() }
             val content = newIndex.toString() + prevHash + serializedTransactions + nonce + timestamp
-            blockHash = HashUtils.bytesToHex(HashUtils.sha256(content.toByteArray()))
+            blockHash = HashUtils.bytesToHex(SHA1.produceHash(content.toByteArray()))
         } while (blockHash!!.substring(0, chain.difficulty) != "0".repeat(chain.difficulty))
 
         return Block(newIndex, prevHash, blockHash, transactions, nonce, timestamp)

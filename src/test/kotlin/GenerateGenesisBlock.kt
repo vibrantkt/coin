@@ -1,12 +1,10 @@
 import models.Block
 import models.Transaction
 import models.TransactionPayload
-import node.Chain
 import org.junit.Assert.assertEquals
-import org.junit.Ignore
 import org.junit.Test
-import org.vibrant.example.chat.base.util.AccountUtils
-import org.vibrant.example.chat.base.util.HashUtils
+import org.vibrant.base.util.HashUtils
+import org.vibrant.base.util.SHA1
 
 class GenerateGenesisBlock {
 
@@ -24,30 +22,19 @@ class GenerateGenesisBlock {
                 "0x0",
                 "0x0",
                 TransactionPayload(100_000_000L),
-                HashUtils.bytesToHex(HashUtils.sha1(("0x0" + "0x0" + TransactionPayload(100_000_000L).serialize()).toByteArray())),
+                HashUtils.bytesToHex(SHA1.produceHash(("0x0" + "0x0" + TransactionPayload(100_000_000L).serialize()).toByteArray())),
                 "0x0"
         )
         do {
             nonce++
             val serializedTransactions = genesisTransaction.serialize()
             val content = newIndex.toString() + prevHash + serializedTransactions + nonce + timestamp
-            blockHash = HashUtils.bytesToHex(HashUtils.sha256(content.toByteArray()))
+            blockHash = HashUtils.bytesToHex(SHA1.produceHash(content.toByteArray()))
         } while (blockHash!!.substring(0, difficulty) != "0".repeat(difficulty))
 
         assertEquals(
                 Block(newIndex, prevHash, blockHash, listOf(genesisTransaction), nonce, timestamp = 0).serialize(),
                 CLI::class.java.getResource("genesis.json").readText()
         )
-    }
-
-
-    @Ignore
-    @Test
-    fun `123`(){
-        val key = AccountUtils.generateKeyPair()
-        println(key.public.algorithm)
-        println(key.public.format)
-        println(key.public.encoded)
-//        println(HashUtils.bytesToHex())
     }
 }

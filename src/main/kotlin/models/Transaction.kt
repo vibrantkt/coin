@@ -2,11 +2,11 @@ package models
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
+import node.JSONSerializer
 import org.vibrant.base.database.blockchain.models.HashedTransaction
-import org.vibrant.base.database.blockchain.models.TransactionModel
-import org.vibrant.base.database.blockchain.models.TransactionPayload
-import org.vibrant.example.chat.base.util.AccountUtils
-import org.vibrant.example.chat.base.util.HashUtils
+import org.vibrant.base.util.HashUtils
+import org.vibrant.base.util.SHA1
+import org.vibrant.base.util.SignTools
 import serialize
 import java.security.KeyPair
 import java.security.PublicKey
@@ -26,13 +26,13 @@ data class Transaction(
                     from,
                     to,
                     payload,
-                    HashUtils.bytesToHex(HashUtils.sha1((from + to + payload.serialize()).toByteArray())),
-                    HashUtils.bytesToHex(AccountUtils.signData((from + to + payload.serialize()), keyPair)))
+                    HashUtils.bytesToHex(SHA1.produceHash((from + to + payload.serialize()).toByteArray())),
+                    HashUtils.bytesToHex(SignTools.signDataWith(from.toByteArray() + to.toByteArray() + JSONSerializer.serialize(payload), "SHA1withRSA", keyPair)))
         }
 
 
         fun verify(it: Transaction): Boolean {
-            return AccountUtils.verifySignature(it.from + it.to + it.payload.serialize(), object: PublicKey {
+            return SignTools.verifyDataSignature(it.from.toByteArray() + it.to.toByteArray() + JSONSerializer.serialize(it.payload), object: PublicKey {
                 override fun getAlgorithm(): String {
                     return "RSA"
                 }
@@ -45,7 +45,7 @@ data class Transaction(
                     return "X.509"
                 }
 
-            }, HashUtils.hexToBytes(it.signature))
+            }, HashUtils.hexToBytes(it.signature), "SHA1withRSA")
         }
     }
 }
