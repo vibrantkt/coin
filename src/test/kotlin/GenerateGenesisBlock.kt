@@ -1,10 +1,10 @@
 import models.Block
 import models.Transaction
-import models.TransactionPayload
+import models.SimpleTransactionPayload
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.vibrant.base.util.HashUtils
-import org.vibrant.base.util.SHA1
+import org.vibrant.core.hash.HashUtils
+import org.vibrant.core.hash.SHA1
 
 class GenerateGenesisBlock {
 
@@ -21,8 +21,8 @@ class GenerateGenesisBlock {
         val genesisTransaction = Transaction(
                 "0x0",
                 "0x0",
-                TransactionPayload(100_000_000L),
-                HashUtils.bytesToHex(SHA1.produceHash(("0x0" + "0x0" + TransactionPayload(100_000_000L).serialize()).toByteArray())),
+                SimpleTransactionPayload(100_000_000L),
+                HashUtils.bytesToHex(SHA1.produceHash(("0x0" + "0x0" + SimpleTransactionPayload(100_000_000L).serialize()).toByteArray())),
                 "0x0"
         )
         do {

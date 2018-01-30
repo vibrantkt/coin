@@ -1,7 +1,7 @@
 import node.Node
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
-import org.vibrant.base.util.SignTools
+import org.vibrant.core.hash.SignTools
 import java.io.File
 
 class TestLoadKeyFromFile {

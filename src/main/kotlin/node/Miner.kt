@@ -5,8 +5,8 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import models.Block
 import models.Transaction
-import org.vibrant.base.util.HashUtils
-import org.vibrant.base.util.SHA1
+import org.vibrant.core.hash.HashUtils
+import org.vibrant.core.hash.SHA1
 import serialize
 import java.util.*
 

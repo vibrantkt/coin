@@ -1,11 +1,11 @@
 package node
 
 import models.Transaction
-import models.TransactionPayload
-import org.vibrant.base.node.JSONRPCNode
-import org.vibrant.base.rpc.json.JSONRPCResponse
-import org.vibrant.base.util.HashUtils
+import models.SimpleTransactionPayload
+import org.vibrant.core.hash.HashUtils
+import org.vibrant.core.node.JSONRPCNode
 import org.vibrant.core.node.RemoteNode
+import org.vibrant.core.rpc.json.JSONRPCResponse
 import serialize
 import java.io.*
 import java.net.Socket
@@ -94,7 +94,7 @@ open class Node : JSONRPCNode<Peer>() {
 
     fun transaction(to: String, amount: Long): List<JSONRPCResponse<*>> {
         this.checkAccount()
-        val tp = TransactionPayload(amount)
+        val tp = SimpleTransactionPayload(amount)
         val transaction = Transaction.create(this.hexAccountAddress()!!, to, tp, this.keyPair!!)
         return this.peer.broadcast(createRequest(
                 "addTransaction",
@@ -106,7 +106,7 @@ open class Node : JSONRPCNode<Peer>() {
 
     fun gimmeMoney(amount: Long): List<JSONRPCResponse<*>> {
         this.checkAccount()
-        val transaction = Transaction.create("0x0", this.hexAccountAddress()!!, TransactionPayload(amount), this.keyPair!!)
+        val transaction = Transaction.create("0x0", this.hexAccountAddress()!!, SimpleTransactionPayload(amount), this.keyPair!!)
         return this.peer.broadcast(createRequest(
                 "addTransaction",
                 arrayOf(transaction.serialize())

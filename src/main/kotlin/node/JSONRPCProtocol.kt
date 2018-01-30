@@ -4,12 +4,15 @@ import models.Block
 import models.BlockChain
 import models.Transaction
 import mu.KotlinLogging
-import org.vibrant.base.database.blockchain.InstantiateBlockChain
-import org.vibrant.base.rpc.JSONRPCMethod
-import org.vibrant.base.rpc.json.*
 import org.vibrant.core.ConcreteModelSerializer
+import org.vibrant.core.database.blockchain.InstantiateBlockChain
 import org.vibrant.core.models.Model
 import org.vibrant.core.node.RemoteNode
+import org.vibrant.core.rpc.JSONRPCMethod
+import org.vibrant.core.rpc.json.JSONRPC
+import org.vibrant.core.rpc.json.JSONRPCBlockChainSynchronization
+import org.vibrant.core.rpc.json.JSONRPCRequest
+import org.vibrant.core.rpc.json.JSONRPCResponse
 
 @Suppress("UNUSED_PARAMETER", "unused")
 class JSONRPCProtocol(override val node: Node) : JSONRPC(), JSONRPCBlockChainSynchronization<Peer, Block, Transaction, BlockChain> {
@@ -49,8 +52,8 @@ class JSONRPCProtocol(override val node: Node) : JSONRPC(), JSONRPCBlockChainSyn
     }
 
     override val modelToProducer: InstantiateBlockChain<Block, BlockChain> =
-            object: InstantiateBlockChain<Block, BlockChain>{
-                override fun asBlockChainProducer(model: BlockChain): org.vibrant.base.database.blockchain.BlockChain<Block, BlockChain> {
+            object: InstantiateBlockChain<Block, BlockChain> {
+                override fun asBlockChainProducer(model: BlockChain): org.vibrant.core.database.blockchain.BlockChain<Block, BlockChain> {
                     val producer = Chain()
                     producer.setBlocks(model.blocks.toList())
                     return producer

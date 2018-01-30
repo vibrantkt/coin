@@ -1,14 +1,14 @@
 import models.Block
 import models.Transaction
-import models.TransactionPayload
+import models.SimpleTransactionPayload
 import node.Chain
 import node.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.vibrant.base.util.HashUtils
-import org.vibrant.base.util.SHA1
-import org.vibrant.base.util.SHA256
-import org.vibrant.base.util.SignTools
+import org.vibrant.core.hash.HashUtils
+import org.vibrant.core.hash.SHA1
+import org.vibrant.core.hash.SHA256
+import org.vibrant.core.hash.SignTools
 import org.vibrant.core.node.RemoteNode
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -60,8 +60,8 @@ class TestCoin{
                         Transaction(
                                 "0x0",
                                 node.hexAccountAddress()!!,
-                                TransactionPayload(1000L),
-                                HashUtils.bytesToHex(SHA1.produceHash(("0x0" + node.hexAccountAddress()!! + TransactionPayload(1000L).serialize()).toByteArray())),
+                                SimpleTransactionPayload(1000L),
+                                HashUtils.bytesToHex(SHA1.produceHash(("0x0" + node.hexAccountAddress()!! + SimpleTransactionPayload(1000L).serialize()).toByteArray())),
                                 "signature"
                         )
                 ))
@@ -72,7 +72,7 @@ class TestCoin{
         val tp = Transaction.create(
                 node.hexAccountAddress()!!,
                 node2.hexAccountAddress()!!,
-                TransactionPayload(100L),
+                SimpleTransactionPayload(100L),
                 node.keyPair!!
         )
 
@@ -118,7 +118,7 @@ class TestCoin{
         val tp = Transaction.create(
                 node.hexAccountAddress()!!,
                 node2.hexAccountAddress()!!,
-                TransactionPayload(100L),
+                SimpleTransactionPayload(100L),
                 SignTools.generateKeyPair("RSA")
         )
 
@@ -164,8 +164,8 @@ class TestCoin{
                     Transaction(
                             "0x0",
                             node.hexAccountAddress()!!,
-                            TransactionPayload(1000L),
-                            HashUtils.bytesToHex(SHA1.produceHash(("0x0" + node.hexAccountAddress()!! + TransactionPayload(1000L).serialize()).toByteArray())),
+                            SimpleTransactionPayload(1000L),
+                            HashUtils.bytesToHex(SHA1.produceHash(("0x0" + node.hexAccountAddress()!! + SimpleTransactionPayload(1000L).serialize()).toByteArray())),
                             "signature"
                         )
             ))
@@ -182,7 +182,7 @@ class TestCoin{
         val tp = Transaction.create(
                 node.hexAccountAddress()!!,
                 node2.hexAccountAddress()!!,
-                TransactionPayload(100L),
+                SimpleTransactionPayload(100L),
                 node2.keyPair!!
         )
 
@@ -196,7 +196,7 @@ class TestCoin{
                 arrayOf(Transaction.create(
                         node.hexAccountAddress()!!,
                         node2.hexAccountAddress()!!,
-                        TransactionPayload(200L),
+                        SimpleTransactionPayload(200L),
                         node.keyPair!!
                 ).serialize())
         ))

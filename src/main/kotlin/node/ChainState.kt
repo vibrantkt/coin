@@ -12,7 +12,7 @@ class ChainState(private val chain: Chain) {
 
     init {
         this.initialState()
-        this.chain.addNewBlockListener(object: org.vibrant.base.database.blockchain.BlockChain.NewBlockListener<Block> {
+        this.chain.addNewBlockListener(object: org.vibrant.core.database.blockchain.BlockChain.NewBlockListener<Block> {
             override fun nextBlock(blockModel: Block) {
                 logger.info { "Got new block" }
                 this@ChainState.updateState(blockModel)

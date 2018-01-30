@@ -1,7 +1,7 @@
 import node.Node
 import org.vibrant.core.node.RemoteNode
 import node.JSONSerializer
-import org.vibrant.base.util.SignTools
+import org.vibrant.core.hash.SignTools
 
 class CLI<out T: Node>(val node: T) {
 

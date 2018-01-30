@@ -2,7 +2,7 @@ package models
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import org.vibrant.base.database.blockchain.models.BlockChainModel
+import org.vibrant.core.models.blockchain.BlockChainModel
 import java.util.*
 
 

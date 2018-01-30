@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import models.Block
 import models.BlockChain
 import models.Transaction
-import models.TransactionPayload
+import models.SimpleTransactionPayload
 import org.vibrant.core.ModelSerializer
 import org.vibrant.core.models.Model
 import java.util.HashMap
@@ -25,8 +25,8 @@ object JSONSerializer : ModelSerializer(){
             Transaction::class.java.getAnnotation(JsonTypeName::class.java).value -> {
                 Transaction::class.java
             }
-            TransactionPayload::class.java.getAnnotation(JsonTypeName::class.java).value -> {
-                TransactionPayload::class.java
+            SimpleTransactionPayload::class.java.getAnnotation(JsonTypeName::class.java).value -> {
+                SimpleTransactionPayload::class.java
             }
             else -> {
                 throw kotlin.Exception("Can't deserialize type ${map["@type"]}")

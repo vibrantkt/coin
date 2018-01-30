@@ -3,10 +3,10 @@ package models
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
 import node.JSONSerializer
-import org.vibrant.base.database.blockchain.models.HashedTransaction
-import org.vibrant.base.util.HashUtils
-import org.vibrant.base.util.SHA1
-import org.vibrant.base.util.SignTools
+import org.vibrant.core.hash.HashUtils
+import org.vibrant.core.hash.SHA1
+import org.vibrant.core.hash.SignTools
+import org.vibrant.core.models.transaction.HashedTransactionModel
 import serialize
 import java.security.KeyPair
 import java.security.PublicKey
@@ -17,11 +17,11 @@ import java.security.PublicKey
 data class Transaction(
         val from: String,
         val to: String,
-        val payload: models.TransactionPayload,
+        val payload: SimpleTransactionPayload,
         override val hash: String,
-        val signature: String): HashedTransaction(hash){
+        val signature: String): HashedTransactionModel(hash){
     companion object {
-        fun create(from: String, to: String, payload: models.TransactionPayload, keyPair: KeyPair): Transaction {
+        fun create(from: String, to: String, payload: SimpleTransactionPayload, keyPair: KeyPair): Transaction {
             return Transaction(
                     from,
                     to,
