@@ -3,8 +3,9 @@ package node
 import models.Block
 import models.BlockChain
 import mu.KotlinLogging
-import org.vibrant.core.ModelSerializer
+
 import org.vibrant.core.database.blockchain.InMemoryBlockChain
+import org.vibrant.core.serialization.ModelSerializer
 
 class Chain(val difficulty: Int = 0): InMemoryBlockChain<Block, BlockChain>() {
 

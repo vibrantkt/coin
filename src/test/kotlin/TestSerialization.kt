@@ -6,7 +6,7 @@ import node.JSONSerializer
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.vibrant.core.ConcreteModelSerializer
+import org.vibrant.core.serialization.ConcreteModelSerializer
 import org.vibrant.core.hash.SignTools
 import org.vibrant.core.models.Model
 

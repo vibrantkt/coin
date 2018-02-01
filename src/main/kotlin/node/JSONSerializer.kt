@@ -7,7 +7,7 @@ import models.Block
 import models.BlockChain
 import models.Transaction
 import models.SimpleTransactionPayload
-import org.vibrant.core.ModelSerializer
+import org.vibrant.core.serialization.ModelSerializer
 import org.vibrant.core.models.Model
 import java.util.HashMap
 

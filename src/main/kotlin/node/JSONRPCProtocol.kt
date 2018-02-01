@@ -4,7 +4,7 @@ import models.Block
 import models.BlockChain
 import models.Transaction
 import mu.KotlinLogging
-import org.vibrant.core.ConcreteModelSerializer
+import org.vibrant.core.serialization.ConcreteModelSerializer
 import org.vibrant.core.database.blockchain.InstantiateBlockChain
 import org.vibrant.core.models.Model
 import org.vibrant.core.node.RemoteNode
